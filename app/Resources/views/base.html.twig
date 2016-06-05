@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}DadaWeather - {% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('bundles/core/images/dadaweather_icon.ico') }}" />
+        <link href='https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        {% block header %}{% endblock %}
+        <section id="main">
+            {% block body %}{% endblock %}
+        </section>
+        {% block footer %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

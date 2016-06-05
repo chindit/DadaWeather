@@ -1,0 +1,23 @@
+{%  extends "::base.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets 'bundles/core/css/*' filter='cssrewrite' %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock %}
+
+{% block header %}
+    <header>
+        <span class="main-icon"></span>
+        <h1>DadaWeather</h1>
+        <h3>Votre météo au quotidien</h3>
+    </header>
+{% endblock %}
+
+{% block footer %}
+    <footer>
+        <p>Ce site a été codé fièrement par David Lumaye (<i>aka</i> Chindit)</p>
+        <p>Il est valide HTML5 et CSS3</p>
+    </footer>
+{% endblock %}
