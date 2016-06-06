@@ -1,2 +1,5 @@
 core:
-    resource: '@CoreBundle/Resources/config/routing.xml'
+    resource: '@DadaCoreBundle/Resources/config/routing.xml'
+
+weather:
+    resource: "@DadaWeatherBundle/Resources/config/routing.xml"

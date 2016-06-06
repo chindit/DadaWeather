@@ -1,5 +1,9 @@
+/*
+MAIN STYLES
+*/
 body{
-    background-image: url('../images/background_landscape.jpg');
+    background-image: url('../images/background_garden.jpg');
+    background-size: 100vw;
     font-family: 'Ubuntu', sans-serif;
 }
 header, section#main, footer{
@@ -23,4 +27,16 @@ header span.main-icon{
     vertical-align: middle;
     margin-right: 5px;
     height: 55px;
+}
+footer{
+    font-family: 'Nova Square', cursive;
+    font-size: small;
+}
+
+/*
+CLASSES
+*/
+.round-padded{
+    border-radius: 15px;
+    padding: 5px;
 }

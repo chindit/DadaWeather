@@ -1,0 +1,30 @@
+body{
+    background-image: url('../../bundles/core/images/background_jardin.jpg');
+    font-family: 'Ubuntu', sans-serif;
+}
+header, section#main, footer{
+    background-color: rgba(255, 255, 255, 0.4);
+    padding: 5px;
+    margin: 25px;
+    border-radius: 15px;
+}
+header{
+    text-align: center;
+}
+header h1{
+    font-weight: bolder;
+    display: inline-block;
+}
+header span.main-icon{
+    display: inline-block;
+    background-image: url('../../bundles/core/images/dadaweather_icon.png');
+    background-size: 55px;
+    width: 55px;
+    vertical-align: middle;
+    margin-right: 5px;
+    height: 55px;
+}
+footer{
+    font-family: 'Nova Square', cursive;
+    font-size: small;
+}

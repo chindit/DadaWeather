@@ -5,7 +5,7 @@
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="front_index" path="/">
-        <default key="_controller">CoreBundle:Front:index</default>
+        <default key="_controller">DadaCoreBundle:Front:index</default>
     </route>
 
 </routes>

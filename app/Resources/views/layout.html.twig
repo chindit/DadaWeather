@@ -2,12 +2,48 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets 'bundles/core/css/*' filter='cssrewrite' %}
+    {% stylesheets 'bundles/dadacore/css/*' filter='cssrewrite' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 {% endblock %}
 
 {% block header %}
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url('front_index') }}">
+                    {% image '@DadaCoreBundle/Resources/public/images/dadaweather_icon.png' %}
+                    <img src="{{ asset_url }}" alt="DadaWeather icon" width="25" />
+                    {% endimage %}
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Villes principales <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Namur</a></li>
+                            <li><a href="#">Liège</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Paris</a></li>
+                            <li><a href="#">Marseille</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Madrid</a></li>
+                            <li><a href="#">Séville</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Rome</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Chercher une ville">
+                    </div>
+                    <button type="submit" class="btn btn-default">Chercher</button>
+                </form>
+            </div>
+        </div>
+    </nav>
     <header>
         <span class="main-icon"></span>
         <h1>DadaWeather</h1>
@@ -20,4 +56,11 @@
         <p>Ce site a été codé fièrement par David Lumaye (<i>aka</i> Chindit)</p>
         <p>Il est valide HTML5 et CSS3</p>
     </footer>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts '@DadaCoreBundle/Resources/public/js/*' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
 {% endblock %}
