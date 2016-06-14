@@ -6,6 +6,10 @@
 
     <services>
         <service id="dada_weather.openweather" class="Dada\WeatherBundle\Services\OpenWeather\DadaOpenWeather">
+            <argument>%openweather.api%</argument>
+            <call method="setParams">
+                <argument>%openweather.api.keys%</argument>
+            </call>
         </service>
     </services>
 </container>

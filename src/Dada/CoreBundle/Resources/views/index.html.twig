@@ -3,12 +3,34 @@
 {% block title %}DadaWeather{% endblock %}
 
 {% block body %}
+    {# Shortcut to show data #}
+    {% if weather is defined %}
+        {% set dwok = true %}{# «dwok» for «Data Weather OK» #}
+    {% else %}
+        {% set dwok = false %}
+    {% endif %}
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div class="jumbotron text-center round-padded">
-                <h1>Votre ville actuelle</h1>
-                <p>Oh non!  Nous n'avons pu détecter votre ville actuelle</p>
-                <p><a class="btn btn-primary btn-lg" href="#" role="button">Réessayer</a></p>
+                <h1 id="town-name">{% if dwok %}{{ weather.name }}{% else %}Votre ville actuelle{% endif %}</h1>
+                <table id="town-stats" class="weather" {% if dwok %}data-background="{{ weather.weather.0.icon }}"{% endif %}>
+                    <tr><th colspan="2">Aujourd'hui</th></tr>
+                    <tr><td>Temps</td><td id="town-weather">{% if dwok %}<img src="http://openweathermap.org/img/w/{{ weather.weather.0.icon }}.png" alt="{{ weather.weather.0.description }}">{{ weather.weather.0.description }}{% endif %}</td></tr>
+                    <tr><td>Température</td><td id="town-temperature">{% if dwok %}{{ weather.main.temp }}{% endif %}</td></tr>
+                    <tr><td>T° minimale</td><td id="town-temperature-min">{% if dwok %}{{ weather.main.temp_min }}{% endif %}</td></tr>
+                    <tr><td>T° maximale</td><td id="town-temperature-max">{% if dwok %}{{ weather.main.temp_max }}{% endif %}</td></tr>
+                    <tr><td>Humidité</td><td id="town-humidity">{% if dwok %}{{ weather.main.humidity }}{% endif %}</td></tr>
+                    <tr><td>Pression atmosphérique</td><td id="town-pressure">{% if dwok %}{{ weather.main.pressure }}{% endif %}</td></tr>
+                    <tr><td>Vitesse du vent</td><td id="town-wind">{% if dwok %}{{ weather.wind.speed }}{% endif %}</td></tr>
+                    <tr><td>Direction du vent</td><td id="town-wind-direction">{% if dwok %}{{ weather.wind.deg }}{% endif %}</td></tr>
+                    <tr><td>Couverture nuageuse</td><td id="town-clouds">{% if dwok %}{{ weather.clouds.all }}{% endif %}</td></tr>
+                    <tr><td>Lever du soleil</td><td id="town-sunrise">{% if dwok %}{{ weather.sys.sunrise|date('H:i:s') }}{% endif %}</td></tr>
+                    <tr><td>Coucher du soleil</td><td id="town-sunset">{% if dwok %}{{ weather.sys.sunset|date('H:i:s') }}{% endif %}</td></tr>
+                </table>
+                <div id="town-error {% if not dwok %}hidden{% endif %}">
+                    <p>Oh non!  Nous n'avons pu détecter votre ville actuelle</p>
+                    <p><a class="btn btn-primary btn-lg" href="#" id="actual_city" role="button">Réessayer</a></p>
+                </div>
             </div>
         </div>
     </div>

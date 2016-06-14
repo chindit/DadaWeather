@@ -22,16 +22,16 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Villes principales <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">Namur</a></li>
-                            <li><a href="#">Liège</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':2790472}) }}">Namur</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':2792414}) }}">Liège</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">Paris</a></li>
-                            <li><a href="#">Marseille</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':2968815}) }}">Paris</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':2995469}) }}">Marseille</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">Madrid</a></li>
-                            <li><a href="#">Séville</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':6359304}) }}">Madrid</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':2510911}) }}">Séville</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">Rome</a></li>
+                            <li><a href="{{ path('weather_by_id', {'id':3169070}) }}">Rome</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -56,11 +56,28 @@
         <p>Ce site a été codé fièrement par David Lumaye (<i>aka</i> Chindit)</p>
         <p>Il est valide HTML5 et CSS3</p>
     </footer>
+    {# JAVASCRIPT VARS! #}
+    <script type="text/javascript">
+        {# var apiRoot = '{{ path('api_current_coords') }}'; #}
+        var imageLinks = {};
+        imageLinks['01'] = "url('{{ asset('bundles/dadaweather/images/clear.jpg') }}')";
+        imageLinks['02'] = "url('{{ asset('bundles/dadaweather/image/partially_cloudy.jpg') }}')";
+        imageLinks['03'] = "url('{{ asset('bundles/dadaweather/images/cloudy.jpg') }}')";
+        imageLinks['04'] = "url('{{ asset('bundles/dadaweather/images/fully_cloudy.jpg') }}')";
+        imageLinks['09'] = "url('{{ asset('bundles/dadaweather/images/rain.jpg') }}')";
+        imageLinks['10'] = "url('{{ asset('bundles/dadaweather/images/half_rain.jpg') }}')";
+        imageLinks['11'] = "url('{{ asset('bundles/dadaweather/images/storm.jpg') }}')";
+        imageLinks['13'] = "url('{{ asset('bundles/dadaweather/images/snow.jpg') }}')";
+        imageLinks['50'] = "url('{{ asset('bundles/dadaweather/images/fog.jpg') }}')";
+    </script>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts '@DadaCoreBundle/Resources/public/js/*' %}
-        <script src="{{ asset_url }}"></script>
+    {% javascripts
+        '@DadaCoreBundle/Resources/public/js/*'
+        '@DadaWeatherBundle/Resources/public/js/*'
+    %}
+    <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}

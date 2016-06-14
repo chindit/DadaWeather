@@ -4,7 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="weather_homepage" path="/">
-        <default key="_controller">WeatherBundle:Default:index</default>
+    <route id="api_current_coords" path="/api/current/coords/{latitude}/{longitude}" methods="GET">
+        <default key="_controller">DadaWeatherBundle:Ajax:getWeatherFromCoords</default>
+        <default key="_format">json</default>
+    </route>
+    <route id="weather_by_id" path="/api/current/by-id/{id}" methods="GET">
+        <default key="_controller">DadaWeatherBundle:Weather:showWeatherFromId</default>
+        <requirement key="id">\d+</requirement>
     </route>
 </routes>

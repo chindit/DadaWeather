@@ -34,6 +34,28 @@ footer{
 }
 
 /*
+ID
+*/
+.hidden{
+    display: none;
+}
+table.weather{
+    margin: auto;
+    border: 1px solid black;
+}
+table.weather tr:not(:last-child){
+    border-bottom: 1px solid lightgray;
+}
+table.weather td{
+    padding: 4px;
+}
+table.weather td:first-child{
+    font-weight: bold;
+    background-color: darkgray;
+}
+
+
+/*
 CLASSES
 */
 .round-padded{
