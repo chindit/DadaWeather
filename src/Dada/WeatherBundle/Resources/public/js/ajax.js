@@ -15,6 +15,7 @@ $(document).ready(function(){
             var iconCode = $('#town-stats').attr('data-background').substr(0, 2);
             console.log(imageLinks[iconCode]);
             $('.jumbotron').css("background-image", imageLinks[iconCode]); //imageLinks is hardcoded in index.html.twig
+            $('.jumbotron').css("background-size", "cover");
         }
 
     }

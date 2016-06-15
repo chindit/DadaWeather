@@ -27,7 +27,7 @@
                     <tr><td>Lever du soleil</td><td id="town-sunrise">{% if dwok %}{{ weather.sys.sunrise|date('H:i:s') }}{% endif %}</td></tr>
                     <tr><td>Coucher du soleil</td><td id="town-sunset">{% if dwok %}{{ weather.sys.sunset|date('H:i:s') }}{% endif %}</td></tr>
                 </table>
-                <div id="town-error {% if not dwok %}hidden{% endif %}">
+                <div id="town-error" {% if dwok %}class="hidden"{% endif %}>
                     <p>Oh non!  Nous n'avons pu détecter votre ville actuelle</p>
                     <p><a class="btn btn-primary btn-lg" href="#" id="actual_city" role="button">Réessayer</a></p>
                 </div>
