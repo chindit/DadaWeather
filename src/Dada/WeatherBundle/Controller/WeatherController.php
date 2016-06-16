@@ -22,6 +22,12 @@ namespace Dada\WeatherBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class WeatherController extends Controller{
+    /**
+     * Render weather for a city ID
+     * 
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function showWeatherFromIdAction($id){
         $owApi = $this->get('dada_weather.openweather');
         $result = $owApi->getWeatherFromId($id);

@@ -12,10 +12,10 @@
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div class="jumbotron text-center round-padded">
-                <h1 id="town-name">{% if dwok %}{{ city_name }}{% else %}Votre ville actuelle{% endif %}</h1>
+                <h2 id="town-name">{% if dwok %}{{ city_name }}{% else %}Votre ville actuelle{% endif %}</h2>
                 <table id="town-stats" class="weather{% if not dwok %} hidden{% endif %}" {% if dwok %}data-background="{{ weather.weather.0.icon }}"{% endif %}>
                     <tr><th colspan="2">Aujourd'hui</th></tr>
-                    <tr><td>Temps</td><td id="town-weather">{% if dwok %}<img src="http://openweathermap.org/img/w/{{ weather.weather.0.icon }}.png" alt="{{ weather.weather.0.description }}">{{ weather.weather.0.description }}{% endif %}</td></tr>
+                    <tr><td>Temps</td><td id="town-weather">{% if dwok %}<img src="http://openweathermap.org/img/w/{{ weather.weather.0.icon }}.png" id="weather-icon" alt="{{ weather.weather.0.description }}">{{ weather.weather.0.description }}{% endif %}</td></tr>
                     <tr><td>Température</td><td id="town-temperature">{% if dwok %}{{ weather.main.temp }}{% endif %}</td></tr>
                     <tr><td>T° minimale</td><td id="town-temperature-min">{% if dwok %}{{ weather.main.temp_min }}{% endif %}</td></tr>
                     <tr><td>T° maximale</td><td id="town-temperature-max">{% if dwok %}{{ weather.main.temp_max }}{% endif %}</td></tr>

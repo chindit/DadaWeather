@@ -20,6 +20,7 @@
 
 namespace Dada\WeatherBundle\Services\OpenWeather;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
@@ -49,7 +50,7 @@ class DadaOpenWeather{
     public function getWeatherFromCoords($latitude, $longitude){
         $apiUrl = '?lat='.$latitude.'&lon='.$longitude;
         $response = $this->getAnswerFromApi($apiUrl);
-        $ajaxResponse = new Response();
+        $ajaxResponse = new JsonResponse();
         $ajaxResponse->setContent(json_encode($response)); //We need to re-encode as JSON because JS is expecting it
         return $ajaxResponse;
     }
@@ -121,7 +122,7 @@ class DadaOpenWeather{
             throw new \NotFoundHttpException('Ooops… It seems the query you did to the API didn\'t show any answer.  Sad day, eh?');
 
         //We automatically translate
-        $decodedResponse = json_decode($apiAnswer);dump($decodedResponse);
+        $decodedResponse = json_decode($apiAnswer);
         //Code used when retrieving WEATHER from api.  Doesn't work with FORECAST
         /*if(isset($decodedResponse->weather[0]->id)){
             $decodedResponse->weather[0]->description = $this->translate($decodedResponse->weather[0]->id);

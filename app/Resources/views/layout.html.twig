@@ -39,14 +39,14 @@
                     <div class="form-group">
                         <input type="text" class="form-control" name="town_name" placeholder="Chercher une ville">
                     </div>
-                    <button type="submit" class="btn btn-default">Chercher</button>
+                    <input type="submit" name="search" id="form-search" class="btn btn-default" value="Chercher">
                 </form>
             </div>
         </div>
     </nav>
     <header>
         <span class="main-icon"></span>
-        <h1>DadaWeather</h1>
+        <h1 id="site-title">DadaWeather</h1>
         <h3>Votre météo au quotidien</h3>
     </header>
     {% for label, flashes in app.session.flashbag.all %}
