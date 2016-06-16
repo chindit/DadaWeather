@@ -21,12 +21,13 @@
 namespace Dada\WeatherBundle\Services\OpenWeather;
 
 use Symfony\Component\HttpFoundation\Response;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
 class DadaOpenWeather{
 
     private $api;
     private $args;
-    private $apiUrl = 'http://api.openweathermap.org/data/2.5/forecast';
+    private $apiUrl = 'http://api.openweathermap.org/data/2.5/forecast'; //Replace «forecast» with «weather» to get only current weather
 
     /**
      * DadaOpenWeather constructor. Basic constructor.  Args can be send by calling «setParam()» method
@@ -37,7 +38,9 @@ class DadaOpenWeather{
     }
 
     /**
-     * Get CURRENT weather form coordinates (Longitude and Latitude)
+     * Get weather form coordinates (Longitude and Latitude)
+     *
+     * @Cache(expires="+1 hour", public=true)
      *
      * @param $latitude : float
      * @param $longitude : float
@@ -53,7 +56,9 @@ class DadaOpenWeather{
 
 
     /**
-     * Get CURRENT weather for a city ID
+     * Get weather for a city ID
+     *
+     *  @Cache(expires="+1 hour", public=true)
      *
      * @param $id : should be valid, it'd work better ;)
      * @throws \InvalidArgumentException : in case ID is not numeric or < 0
@@ -67,7 +72,9 @@ class DadaOpenWeather{
     }
 
     /**
-     * Get CURRENT weather from a city name
+     * Get weather from a city name
+     *
+     *  @Cache(expires="+1 hour", public=true)
      * 
      * @param $name string name of the city
      * @return array API response
