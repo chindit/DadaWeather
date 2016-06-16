@@ -25,7 +25,7 @@ class WeatherController extends Controller{
     public function showWeatherFromIdAction($id){
         $owApi = $this->get('dada_weather.openweather');
         $result = $owApi->getWeatherFromId($id);
-        return $this->render('DadaCoreBundle::index.html.twig', array('weather' => $result));
+        return $this->render('DadaCoreBundle::index.html.twig', array('weather' => $result->list[0], 'city_name' => $result->city->name, 'weatherData' => json_encode($result)));
     }
 
 }

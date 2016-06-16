@@ -26,7 +26,7 @@ class DadaOpenWeather{
 
     private $api;
     private $args;
-    private $apiUrl = 'http://api.openweathermap.org/data/2.5/weather';
+    private $apiUrl = 'http://api.openweathermap.org/data/2.5/forecast';
 
     /**
      * DadaOpenWeather constructor. Basic constructor.  Args can be send by calling «setParam()» method
@@ -63,7 +63,21 @@ class DadaOpenWeather{
         if(!is_numeric($id) || $id < 0)
             throw new \InvalidArgumentException('Expecting positive integer value');
         $apiUrl = 'id='.$id;
-        return $apiResponse = $this->getAnswerFromApi($apiUrl);
+        return $this->getAnswerFromApi($apiUrl);
+    }
+
+    /**
+     * Get CURRENT weather from a city name
+     * 
+     * @param $name string name of the city
+     * @return array API response
+     * @throws \NotFoundHttpException in case $name is invalid
+     */
+    public function getWeatherFromName($name){
+        if(strlen($name) <= 3)
+            throw new \InvalidArgumentException('Expecting string longer than 3 char');
+        $apiUrl = 'q='.$name;
+        return $this->getAnswerFromApi($apiUrl);
     }
 
 
@@ -85,10 +99,11 @@ class DadaOpenWeather{
 
     /**
      * Contact API and return the response
-     *
-     * @param $url : URL to contact (without API url and args)
-     * @return array : API response in array
-     * @throws \NotFoundHttpException : in case of no return from the API
+     * 
+     * @param $url string URL params
+     * @return bool|mixed
+     * @throws UnexpectedResponseException
+     * @throws \NotFoundHttpException
      */
     private function getAnswerFromApi($url){
         $contactUrl = $this->apiUrl.(($url[0] == '?') ? '' : '?').$url.$this->args.'&appid='.$this->api;
@@ -99,9 +114,24 @@ class DadaOpenWeather{
             throw new \NotFoundHttpException('Ooops… It seems the query you did to the API didn\'t show any answer.  Sad day, eh?');
 
         //We automatically translate
-        $decodedResponse = json_decode($apiAnswer);dump($decodedResponse->weather);
-        if(isset($decodedResponse->weather[0]->id)){ dump('BANG');
+        $decodedResponse = json_decode($apiAnswer);dump($decodedResponse);
+        //Code used when retrieving WEATHER from api.  Doesn't work with FORECAST
+        /*if(isset($decodedResponse->weather[0]->id)){
             $decodedResponse->weather[0]->description = $this->translate($decodedResponse->weather[0]->id);
+        }*/
+        if((int)$decodedResponse->cod == 200){
+            //Everything is OK
+            for($i=0; $i<count($decodedResponse->list); $i++){
+                //Translating string
+                $decodedResponse->list[$i]->weather[0]->description = $this->translate($decodedResponse->list[$i]->weather[0]->id);
+            }
+        }
+        else if((int)$decodedResponse->cod > 200){
+            return false; //Default response is just «false»
+        }
+        else{
+            //404 NOT ALLOWED -> Return custom error
+            throw new UnexpectedResponseException('Hum… it\'s embarrasing… Seems like we\'ve received a response from an other galaxy instead of the weather you requested :(');
         }
         return $decodedResponse;
     }
@@ -133,7 +163,7 @@ class DadaOpenWeather{
             312 => 'Pluie bruineuse de forte intensité',
             313 => 'Pluie forte avec bruine',
             314 => 'Pluie intense avec bruine',
-            312 => 'Bruine intense',
+            321 => 'Bruine intense',
             500 => 'Pluie légère',
             501 => 'Pluie modérée',
             502 => 'Pluie de forte intensité',

@@ -58,6 +58,13 @@ table.weather td:first-child{
     font-weight: bold;
     background-color: darkgray;
 }
+#weather-range{
+    background-color: lightgray;
+    width: 75%;
+    margin: auto;
+    padding: 15px;
+    border-radius: 15px;
+}
 
 
 /*

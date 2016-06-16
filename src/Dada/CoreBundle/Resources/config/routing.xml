@@ -7,5 +7,8 @@
     <route id="front_index" path="/">
         <default key="_controller">DadaCoreBundle:Front:index</default>
     </route>
+    <route id="search" path="search" methods="POST">
+        <default key="_controller">DadaCoreBundle:Front:search</default>
+    </route>
 
 </routes>
