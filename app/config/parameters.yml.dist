@@ -20,3 +20,4 @@ parameters:
     openweather.api:   yourOpenWeatherAPIKey
     openweather.api.keys:
         units: metric
+        lang: fr

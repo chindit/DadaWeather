@@ -22,26 +22,25 @@ namespace Dada\WeatherBundle\Services\OpenWeather;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 
 class DadaOpenWeather{
 
     private $api;
     private $args;
     private $apiUrl = 'http://api.openweathermap.org/data/2.5/forecast'; //Replace «forecast» with «weather» to get only current weather
+    private $cache; //Cache dir
 
     /**
      * DadaOpenWeather constructor. Basic constructor.  Args can be send by calling «setParam()» method
      * @param $api : API key for OpenWeather
      */
-    public function __construct($api){
+    public function __construct($api, $cache){
         $this->api = $api;
+        $this->cache = $cache;
     }
 
     /**
      * Get weather form coordinates (Longitude and Latitude)
-     *
-     * @Cache(expires="+1 hour", public=true)
      *
      * @param $latitude : float
      * @param $longitude : float
@@ -59,8 +58,6 @@ class DadaOpenWeather{
     /**
      * Get weather for a city ID
      *
-     *  @Cache(expires="+1 hour", public=true)
-     *
      * @param $id : should be valid, it'd work better ;)
      * @throws \InvalidArgumentException : in case ID is not numeric or < 0
      * @return JSON value
@@ -74,8 +71,6 @@ class DadaOpenWeather{
 
     /**
      * Get weather from a city name
-     *
-     *  @Cache(expires="+1 hour", public=true)
      * 
      * @param $name string name of the city
      * @return array API response
@@ -114,6 +109,11 @@ class DadaOpenWeather{
      * @throws \NotFoundHttpException
      */
     private function getAnswerFromApi($url){
+        //Check for cache
+        if($this->hasCache($url))
+            return $this->getCache($url); //Use cache if exists
+
+        //If no cache, contact API
         $contactUrl = $this->apiUrl.(($url[0] == '?') ? '' : '?').$url.$this->args.'&appid='.$this->api;
         if(filter_var($contactUrl, FILTER_VALIDATE_URL) === false)
             throw new \InvalidArgumentException('Unable to contact the API.  URL appears to be malformed');
@@ -123,15 +123,17 @@ class DadaOpenWeather{
 
         //We automatically translate
         $decodedResponse = json_decode($apiAnswer);
-        //Code used when retrieving WEATHER from api.  Doesn't work with FORECAST
-        /*if(isset($decodedResponse->weather[0]->id)){
-            $decodedResponse->weather[0]->description = $this->translate($decodedResponse->weather[0]->id);
-        }*/
+
         if((int)$decodedResponse->cod == 200){
             //Everything is OK
             for($i=0; $i<count($decodedResponse->list); $i++){
-                //Translating string
-                $decodedResponse->list[$i]->weather[0]->description = $this->translate($decodedResponse->list[$i]->weather[0]->id);
+                //UCFirst… better for my eyes
+                $decodedResponse->list[$i]->weather[0]->description = ucfirst($decodedResponse->list[$i]->weather[0]->description);
+
+                //If we are here, we NEED to create cache (logical, no?)
+                $this->writeCache($url, $decodedResponse); //Creating cache is as simple as that
+
+                return $decodedResponse;
             }
         }
         else if((int)$decodedResponse->cod > 200){
@@ -141,93 +143,56 @@ class DadaOpenWeather{
             //404 NOT ALLOWED -> Return custom error
             throw new UnexpectedResponseException('Hum… it\'s embarrasing… Seems like we\'ve received a response from an other galaxy instead of the weather you requested :(');
         }
-        return $decodedResponse;
+
+        //We CANNOT reach this point!  This return is just too keep IDE quiet.
+        return false;
     }
 
     /**
-     * Basic translator.  We just translate weather string
-     *
-     * @param $code : Weather code
-     * @return string : translated weather
-     * @throws \NotFoundHttpException : in case $code doesn't exists
+     * Verify if cache exists
+     * @param $url string URL data requested to API
+     * @return bool Cache exists
      */
-    private function translate($code){
-        $codes = array(
-            200 => 'Orage avec pluie légère',
-            201 => 'Orage avec pluie',
-            202 => 'Orage avec pluie intense',
-            210 => 'Petit orage',
-            211 => 'Orage',
-            212 => 'Orage intense',
-            221 => 'Orage extrême',
-            230 => 'Orage avec bruine légère',
-            231 => 'Orage avec bruine',
-            232 => 'Orage avec bruine intense',
-            300 => 'Bruine de faible intensité',
-            301 => 'Bruine',
-            302 => 'Bruine de forte intensité',
-            310 => 'Pluie bruineuse de faible intensité',
-            311 => 'Pluie bruineuse',
-            312 => 'Pluie bruineuse de forte intensité',
-            313 => 'Pluie forte avec bruine',
-            314 => 'Pluie intense avec bruine',
-            321 => 'Bruine intense',
-            500 => 'Pluie légère',
-            501 => 'Pluie modérée',
-            502 => 'Pluie de forte intensité',
-            503 => 'Pluie très intense',
-            504 => 'Pluie extrême',
-            511 => 'Pluie verglaçante',
-            520 => 'Averse faible',
-            521 => 'Averse',
-            522 => 'Averse de forte intensité',
-            531 => 'Averse extrême',
-            600 => 'Neige légère',
-            601 => 'Neige',
-            602 => 'Neige intense',
-            611 => 'Neige fondante',
-            612 => 'Grésil',
-            615 => 'Pluie légère mêlée de neige',
-            616 => 'Pluie et neige',
-            620 => 'Averse de neigeuse modérée',
-            621 => 'Averse neigeuse',
-            622 => 'Averse neigeuse intense',
-            701 => 'Brouillard léger',
-            711 => 'Brouillard',
-            721 => 'Brume',
-            731 => 'Tempête de sable',
-            741 => 'Brouillard intense',
-            751 => 'Sable',
-            761 => 'Poussière',
-            762 => 'Poussière volcanique',
-            771 => 'Bourrasques intenses',
-            781 => 'Tornade',
-            800 => 'Ciel dégagé',
-            801 => 'Quelques nuages',
-            802 => 'Nuages épars',
-            803 => 'Nuages brisés',
-            804 => 'Nuages importants',
-            900 => 'Tornade',
-            901 => 'Tempête tropicale',
-            902 => 'Ouragan',
-            903 => 'Froid',
-            904 => 'Chaud',
-            905 => 'Venteux',
-            906 => 'Grêle',
-            951 => 'Calme',
-            952 => 'Brise légère',
-            953 => 'Brise douce',
-            954 => 'Brise modérée',
-            955 => 'Brise fraîche',
-            956 => 'Brise intense',
-            957 => 'Vent fort avec bourrasques',
-            958 => 'Bourrasques',
-            959 => 'Bourrasques sévères',
-            960 => 'Tempête',
-            961 => 'Tempête violente',
-            962 => 'Ouragan');
-        if(!array_key_exists($code, $codes))
-            throw new \NotFoundHttpException('The weather you\'re looking for doesn\'t exists in our database');
-        return $codes[$code];
+    private function hasCache($url){
+        $filename = $this->createFilenameFromUrl($url);
+        return (is_file($filename) && filemtime($filename) > (time()-3600));
     }
+
+    /**
+     * Generate the cache filename from the URL.  Basically, we just remove all meta-char and replace them with '_'
+     * @param $url string URL data requested to API
+     * @return string filename
+     */
+    private function createFilenameFromUrl($url){
+        $transfo = array('?' => '_', '/' => '_', '&' => '_', '=' => '_');
+        $filename = strtr($url, $transfo);
+        return $this->cache.(($this->cache[(strlen($this->cache)-1)] == '/') ? '' : '/').$filename.'.dada_cache';
+    }
+
+    /**
+     * Read the cache file and return it's content
+     * @param $url string URL data requested to API
+     * @return mixed content of API query
+     */
+    private function getCache($url){
+        $filename = $this->createFilenameFromUrl($url);
+        $content = unserialize(file_get_contents($filename));
+        return $content;
+    }
+
+    /**
+     * Write the cache
+     * @param $url string URL data requested to API
+     * @param $data mixed Data returned by API
+     * @return bool returns EVERYTIME true
+     * @throws UnexpectedResponseException Exception in case of write-error
+     */
+    private function writeCache($url, $data){
+        $filename = $this->createFilenameFromUrl($url);dump('CREATE CACHE');
+        $result = file_put_contents($filename, serialize($data));
+        if($result === false)
+            throw new UnexpectedResponseException('Unable to write cache. Please review parameters.  Thanks');
+        return true; //Useless… but keeps IDE happy
+    }
+
 }

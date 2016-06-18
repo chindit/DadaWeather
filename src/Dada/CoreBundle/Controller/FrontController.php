@@ -4,12 +4,12 @@ namespace Dada\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Dada\WeatherBundle\Services\DadaCache;
 
 class FrontController extends Controller{
 
     /**
      * Front controller.  Nothing special
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(){
