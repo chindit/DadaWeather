@@ -27,6 +27,7 @@ class FrontControllerTest extends WebTestCase
 
         $crawler = $client->submit($form); //Getting form
         $this->assertEquals(200, $client->getResponse()->getStatusCode()); //Checking form submission
-        $this->assertGreaterThan(5, strlen($crawler->filter('#town-weather')->text())); //Checking if info is correctly retrieved (if info is OK, there is a small text here)
+        //$this->assertGreaterThan(5, strlen($crawler->filter('#town-weather')->text())); //Checking if info is correctly retrieved (if info is OK, there is a small text here)
+        $this->assertEquals('Arrondissement Brussel', $crawler->filter('#town-name')->text());
     }
 }
