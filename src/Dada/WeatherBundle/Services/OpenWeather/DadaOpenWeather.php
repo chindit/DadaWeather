@@ -22,19 +22,21 @@ namespace Dada\WeatherBundle\Services\OpenWeather;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Dada\WeatherBundle\Services\Cache\DadaCache;
 
 class DadaOpenWeather{
 
     private $api;
     private $args;
     private $apiUrl = 'http://api.openweathermap.org/data/2.5/forecast'; //Replace «forecast» with «weather» to get only current weather
-    private $cache; //Cache dir
+    private $cache; //DadaCache instance
 
     /**
      * DadaOpenWeather constructor. Basic constructor.  Args can be send by calling «setParam()» method
-     * @param $api : API key for OpenWeather
+     * @param $api string API key for OpenWeather
+     * @param $cache string Path to cache directory
      */
-    public function __construct($api, $cache){
+    public function __construct($api, DadaCache $cache){
         $this->api = $api;
         $this->cache = $cache;
     }
@@ -110,8 +112,8 @@ class DadaOpenWeather{
      */
     private function getAnswerFromApi($url){
         //Check for cache
-        if($this->hasCache($url))
-            return $this->getCache($url); //Use cache if exists
+        if($this->cache->hasCache($url))
+            return $this->cache->getCache($url); //Use cache if exists
 
         //If no cache, contact API
         $contactUrl = $this->apiUrl.(($url[0] == '?') ? '' : '?').$url.$this->args.'&appid='.$this->api;
@@ -128,10 +130,10 @@ class DadaOpenWeather{
             //Everything is OK
             for($i=0; $i<count($decodedResponse->list); $i++){
                 //UCFirst… better for my eyes
-                $decodedResponse->list[$i]->weather[0]->description = ucfirst($decodedResponse->list[$i]->weather[0]->description);
+                $decodedResponse->list[$i]->weather[0]->description = ucfirst(trim($decodedResponse->list[$i]->weather[0]->description));
 
                 //If we are here, we NEED to create cache (logical, no?)
-                $this->writeCache($url, $decodedResponse); //Creating cache is as simple as that
+                $this->cache->writeCache($url, $decodedResponse); //Creating cache is as simple as that
 
                 return $decodedResponse;
             }
@@ -146,53 +148,6 @@ class DadaOpenWeather{
 
         //We CANNOT reach this point!  This return is just too keep IDE quiet.
         return false;
-    }
-
-    /**
-     * Verify if cache exists
-     * @param $url string URL data requested to API
-     * @return bool Cache exists
-     */
-    private function hasCache($url){
-        $filename = $this->createFilenameFromUrl($url);
-        return (is_file($filename) && filemtime($filename) > (time()-3600));
-    }
-
-    /**
-     * Generate the cache filename from the URL.  Basically, we just remove all meta-char and replace them with '_'
-     * @param $url string URL data requested to API
-     * @return string filename
-     */
-    private function createFilenameFromUrl($url){
-        $transfo = array('?' => '_', '/' => '_', '&' => '_', '=' => '_');
-        $filename = strtr($url, $transfo);
-        return $this->cache.(($this->cache[(strlen($this->cache)-1)] == '/') ? '' : '/').$filename.'.dada_cache';
-    }
-
-    /**
-     * Read the cache file and return it's content
-     * @param $url string URL data requested to API
-     * @return mixed content of API query
-     */
-    private function getCache($url){
-        $filename = $this->createFilenameFromUrl($url);
-        $content = unserialize(file_get_contents($filename));
-        return $content;
-    }
-
-    /**
-     * Write the cache
-     * @param $url string URL data requested to API
-     * @param $data mixed Data returned by API
-     * @return bool returns EVERYTIME true
-     * @throws UnexpectedResponseException Exception in case of write-error
-     */
-    private function writeCache($url, $data){
-        $filename = $this->createFilenameFromUrl($url);dump('CREATE CACHE');
-        $result = file_put_contents($filename, serialize($data));
-        if($result === false)
-            throw new UnexpectedResponseException('Unable to write cache. Please review parameters.  Thanks');
-        return true; //Useless… but keeps IDE happy
     }
 
 }

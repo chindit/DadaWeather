@@ -7,10 +7,13 @@
     <services>
         <service id="dada_weather.openweather" class="Dada\WeatherBundle\Services\OpenWeather\DadaOpenWeather">
             <argument>%openweather.api%</argument>
-            <argument>%kernel.cache_dir%</argument>
+            <argument type="service" id="dada_cache" />
             <call method="setParams">
                 <argument>%openweather.api.keys%</argument>
             </call>
+        </service>
+        <service id="dada_cache" class="Dada\WeatherBundle\Services\Cache\DadaCache">
+            <argument>%kernel.cache_dir%</argument>
         </service>
     </services>
 </container>
