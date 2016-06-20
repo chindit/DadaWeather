@@ -35,7 +35,7 @@
                 </div>
                 <div id="town-error" {% if dwok %}class="hidden"{% endif %}>
                     <p>Oh non!  Nous n'avons pu détecter votre ville actuelle</p>
-                    <p><a class="btn btn-primary btn-lg" href="#" id="actual_city" role="button">Réessayer</a></p>
+                    <p><a class="btn btn-primary btn-lg" href="#" id="actual_city" role="button" data-url="{{ path('api_current_coords', {'latitude': '01', 'longitude': '02'}) }}">Réessayer</a></p>
                 </div>
             </div>
         </div>

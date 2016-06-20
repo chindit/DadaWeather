@@ -47,8 +47,11 @@ $(document).ready(function(){
  */
 function locationSuccess(pos) {
     var crd = pos.coords;
+    var url = $('#actual_city').attr('data-url');
+    url = url.replace('01', crd.latitude);
+    url = url.replace('02', crd.longitude);
 
-    $.getJSON('http://localhost/DadaWeather/web/app_dev.php/api/current/coords/'+crd.latitude+'/'+crd.longitude, function(json){
+    $.getJSON(url, function(json){
         console.log(json);
         weatherData = json; //weatherData is a global var defined in layout.html.twig
         updateWeatherData(json.list[0]);
@@ -70,7 +73,7 @@ function getLocation(){
     var options = {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 0
+        maximumAge: (60*60*1000) //1 hour cache
     };
     navigator.geolocation.getCurrentPosition(locationSuccess, locationError, options);
 }
