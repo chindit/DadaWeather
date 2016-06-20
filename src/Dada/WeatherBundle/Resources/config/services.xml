@@ -13,7 +13,7 @@
             </call>
         </service>
         <service id="dada_cache" class="Dada\WeatherBundle\Services\Cache\DadaCache">
-            <argument>%kernel.cache_dir%</argument>
+            <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
     </services>
 </container>

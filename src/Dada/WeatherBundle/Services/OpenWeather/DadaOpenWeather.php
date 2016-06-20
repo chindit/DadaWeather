@@ -49,8 +49,7 @@ class DadaOpenWeather{
      * @return Response : Return a JSON response
      */
     public function getWeatherFromCoords($latitude, $longitude){
-        $apiUrl = '?lat='.$latitude.'&lon='.$longitude;
-        $response = $this->getAnswerFromApi($apiUrl);
+        $response = $this->getAnswerFromApi(array('lat' => $latitude, 'lon' => $longitude)); //MUST be 'lat' and 'lon' or it will fails
         $ajaxResponse = new JsonResponse();
         $ajaxResponse->setContent(json_encode($response)); //We need to re-encode as JSON because JS is expecting it
         return $ajaxResponse;
@@ -67,8 +66,7 @@ class DadaOpenWeather{
     public function getWeatherFromId($id){
         if(!is_numeric($id) || $id < 0)
             throw new \InvalidArgumentException('Expecting positive integer value');
-        $apiUrl = 'id='.$id;
-        return $this->getAnswerFromApi($apiUrl);
+        return $this->getAnswerFromApi(array('id' => $id));
     }
 
     /**
@@ -81,8 +79,7 @@ class DadaOpenWeather{
     public function getWeatherFromName($name){
         if(strlen($name) <= 3)
             throw new \InvalidArgumentException('Expecting string longer than 3 char');
-        $apiUrl = 'q='.$name;
-        return $this->getAnswerFromApi($apiUrl);
+        return $this->getAnswerFromApi(array('q' => $name)); //MUST be 'q' or search won't work
     }
 
 
@@ -105,21 +102,34 @@ class DadaOpenWeather{
     /**
      * Contact API and return the response
      * 
-     * @param $url string URL params
+     * @param $params array Parameters to be passed to API
      * @return bool|mixed
      * @throws UnexpectedResponseException
      * @throws \NotFoundHttpException
      */
-    private function getAnswerFromApi($url){
+    private function getAnswerFromApi($params){
         //Check for cache
-        if($this->cache->hasCache($url))
-            return $this->cache->getCache($url); //Use cache if exists
+        if($this->cache->hasCache($params))
+            return $this->cache->getCache($params); //Use cache if exists
 
-        //If no cache, contact API
-        $contactUrl = $this->apiUrl.(($url[0] == '?') ? '' : '?').$url.$this->args.'&appid='.$this->api;
-        if(filter_var($contactUrl, FILTER_VALIDATE_URL) === false)
+        //Generate valid URL with params
+        $url = $this->apiUrl.'?';
+        foreach($params as $key => $value){
+            $url .= $key.'='.$value.'&';
+        }
+        //Removing last "&"
+        $url = substr($url, 0, (strlen($url)-1));
+        
+        //Adding API params
+        $url .= $this->args;
+        
+        //Adding API key
+        $url .= '&appid='.$this->api;
+
+        //Checking URL before contact
+        if(filter_var($url, FILTER_VALIDATE_URL) === false)
             throw new \InvalidArgumentException('Unable to contact the API.  URL appears to be malformed');
-        $apiAnswer = file_get_contents($contactUrl);
+        $apiAnswer = file_get_contents($url); //Hello API :)
         if(empty($apiAnswer))
             throw new \NotFoundHttpException('Ooops… It seems the query you did to the API didn\'t show any answer.  Sad day, eh?');
 
@@ -133,7 +143,7 @@ class DadaOpenWeather{
                 $decodedResponse->list[$i]->weather[0]->description = ucfirst(trim($decodedResponse->list[$i]->weather[0]->description));
 
                 //If we are here, we NEED to create cache (logical, no?)
-                $this->cache->writeCache($url, $decodedResponse); //Creating cache is as simple as that
+                $this->cache->writeCache($decodedResponse); //Creating cache is as simple as that
 
                 return $decodedResponse;
             }

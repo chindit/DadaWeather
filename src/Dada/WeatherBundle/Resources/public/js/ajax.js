@@ -46,7 +46,7 @@ $(document).ready(function(){
  * @param pos
  */
 function locationSuccess(pos) {
-    var crd = pos.coords;
+    var crd = pos.coords;console.log(crd);
     var url = $('#actual_city').attr('data-url');
     url = url.replace('01', crd.latitude);
     url = url.replace('02', crd.longitude);

@@ -20,25 +20,44 @@
 
 namespace Dada\WeatherBundle\Services\Cache;
 
+use Dada\WeatherBundle\Services\OpenWeather\InvalidRequestException;
+use Dada\WeatherBundle\Entity\CachedWeather;
+
 class DadaCache{
-    private $cache; //Cache directory
+    private $repository; //Doctrine repo
+    private $doctrine; //Doctrine _em
 
     /**
      * Basic constructor.  Just storing data into args.
      * @param $cache string cache directory
      */
-    public function __construct($cache){
-        $this->cache = $cache;
+    public function __construct($doctrine){
+        $this->repository = $doctrine->getRepository('DadaWeatherBundle:CachedWeather'); //Calling directly repo to earn some time
+        $this->doctrine = $doctrine;
     }
 
     /**
      * Verify if cache exists
-     * @param $url string URL data requested to API
+     * @param $data array parameters send to API
      * @return bool Cache exists
+     * @throws InvalidRequestException In case request made to API could not be determined
      */
-    public function hasCache($url){
-        $filename = $this->createFilenameFromUrl($url);
-        return (is_file($filename) && filemtime($filename) > (time()-3600));
+    public function hasCache($data){
+        //3 options: Location, ID or town name.
+        if(array_key_exists('id', $data)){ //We've got an ID
+            return (!empty($this->repository->findByTownId($data['id'])));
+        }
+        else if(array_key_exists('q', $data)){ //Search string. WARNING: will not work very well
+            return (!empty($this->repository->findByTownName($data['q'])));
+        }
+        else if(array_key_exists('lat', $data)){
+            //In case of coords, we accept 1' diff (~1km -> ~1.9Km)
+            return (!empty($this->repository->findByCoords($data['lat'], $data['lon'])));
+        }
+        else{
+            //CANNOT exists
+            throw new InvalidRequestException('The request you\'ve made to the API is not valid');
+        }
     }
 
     /**
@@ -46,35 +65,52 @@ class DadaCache{
      * @param $url string URL data requested to API
      * @return mixed content of API query
      */
-    public function getCache($url){
-        $filename = $this->createFilenameFromUrl($url);
-        $content = unserialize(file_get_contents($filename));
-        return $content;
+    public function getCache($data){
+        //Use this for debug
+        //dump('CACHED');
+        
+        //3 options: Location, ID or town name.
+        if(array_key_exists('id', $data)){ //We've got an ID
+            return $this->repository->findByTownId($data['id'], true)->getData();
+        }
+        else if(array_key_exists('q', $data)){ //Search string. WARNING: will not work very well
+            return $this->repository->findByTownName($data['q'], true)->getData();
+        }
+        else if(array_key_exists('lat', $data)){
+            //In case of coords, we accept 1' diff (~1km -> ~1.9Km)
+            return $this->repository->findByCoords($data['lat'], $data['lon'], true)->getData();
+        }
+        else{
+            //CANNOT exists
+            throw new InvalidRequestException('The request you\'ve made to the API is not valid');
+        }
     }
 
     /**
      * Write the cache
-     * @param $url string URL data requested to API
-     * @param $data mixed Data returned by API
-     * @return bool returns EVERYTIME true
-     * @throws UnexpectedResponseException Exception in case of write-error
+     * @param $data array Data returned by API
+     * @return void
      */
-    public function writeCache($url, $data){
-        $filename = $this->createFilenameFromUrl($url);
-        $result = file_put_contents($filename, serialize($data));
-        if($result === false)
-            throw new UnexpectedResponseException('Unable to write cache. Please review parameters.  Thanks');
-        return true; //Useless… but keeps IDE happy
-    }
+    public function writeCache($data){
+        $toCache = new CachedWeather();
+        $toCache->setTownId($data->city->id);
+        $toCache->setTownName($data->city->name);
+        $toCache->setLatitude($data->city->coord->lat);
+        $toCache->setLongitude($data->city->coord->lon);
+        $toCache->setData($data);
+        
+        //When here, we clean cache.  We could have done it on pre-persist but it leaves the townName's bug alive :(
+        $this->repository->cleanCache();
+        
+        //If user search for «Anvers» -> No cache detected BUT «Antwerpen» is cached.  So… we can't save weather.
+        if($this->repository->findByTownId($data->city->id)){
+            return;
+        }
+        
+        $this->doctrine->persist($toCache);
+        $this->doctrine->flush();
 
-    /**
-     * Generate the cache filename from the URL.  Basically, we just remove all meta-char and replace them with '_'
-     * @param $url string URL data requested to API
-     * @return string filename
-     */
-    private function createFilenameFromUrl($url){
-        $transfo = array('?' => '_', '/' => '_', '&' => '_', '=' => '_');
-        $filename = strtr($url, $transfo);
-        return $this->cache.(($this->cache[(strlen($this->cache)-1)] == '/') ? '' : '/').$filename.'.dada_cache';
+       return;
     }
+    
 }
