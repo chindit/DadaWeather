@@ -101,14 +101,18 @@ class DadaCache{
         
         //When here, we clean cache.  We could have done it on pre-persist but it leaves the townName's bug alive :(
         $this->repository->cleanCache();
-        
-        //If user search for «Anvers» -> No cache detected BUT «Antwerpen» is cached.  So… we can't save weather.
-        if($this->repository->findByTownId($data->city->id)){
-            return;
+        $this->doctrine->flush(); //Flush before insert for safety
+
+        //Workaround for INSERT IGNORE
+        try{
+            $this->doctrine->persist($toCache);
+            $this->doctrine->flush();
         }
-        
-        $this->doctrine->persist($toCache);
-        $this->doctrine->flush();
+        catch(\Exception $e){
+            if($e->getErrorCode() !== 1062){ //1062 is the key for duplicate content
+                throw $e;
+            }
+        }
 
        return;
     }
