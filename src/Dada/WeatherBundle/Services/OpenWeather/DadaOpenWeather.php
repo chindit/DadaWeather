@@ -148,12 +148,9 @@ class DadaOpenWeather{
                 return $decodedResponse;
             }
         }
-        else if((int)$decodedResponse->cod > 200){
-            return false; //Default response is just «false»
-        }
         else{
             //404 NOT ALLOWED -> Return custom error
-            throw new UnexpectedResponseException('Hum… it\'s embarrasing… Seems like we\'ve received a response from an other galaxy instead of the weather you requested :(');
+            throw new UnexpectedResponseException('Hum… it\'s embarrasing… Seems like we couldn\'t find the weather you requested :(');
         }
 
         //We CANNOT reach this point!  This return is just too keep IDE quiet.
