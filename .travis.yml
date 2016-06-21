@@ -5,6 +5,10 @@ php:
 env:
   - SYMFONY_VERSION="3.1.*"
 
+parameters:
+    openweather.api:
+        secure: "GQ+cgxx/0S8RheNrW5er4TP6ljeUHHzO79JMugeFBVzcjzPptxAN0ulRRbODU0kDrk1J7B7G3dOMagM52OjbkDLwTCTyKNDvCl9w3YvXSwWnItwmIGQc8aUyH0dZCZ4tcHPzUV8yrRYWc3xgROSWbKc+9+/CnQ+5UUQWxl4GuFl7DLNcAPpQ3BWpv0jPlH8t5eSXS/1TgrkOYIzu5mddan/qnveas2BQLZ5uQsZlnlwW00MyT/64SNaRzf6kMXo8b3kAG+ji1AxbErt6KymZ7lVLaQLy9gYtN24u/vn9YXF1S2HA9ob+Nwgz3/6Na1GUPredGuSrfeVNPiFuF/4S+oemypGyEQwF1VbfGe6X+l5Kd2kmATWt8AFndB3SArziVCbsxsZle4Vq1+gGS6bh4oBOO1meV4qqeR4NZSPdjbqfJbWL2rVYu125Laux0GS6o1Q9GkoOGanMWENE9s0a/6Ur/WPcMcbi15Df9+6ypx66JL50syqAab0l2WU6qjNG1/PGus7VcVUwNz04eE1NBcKCuXoXZBd7vG392Sav7DkaJQbF1Us2OCOp+heO1uEmMo4/+Z3mvDYgTEvyLzIxONV113z4VXQE1Eb8BHECoV3gtAt8t4AxqehWWXaOcBvT8VROwHSWYHx/tz+w51UNq/+p6nxKksLIW/V/ai7l2mo="
+
 before_script:
     - mysql -e 'create database symfony;'
     - composer self-update
