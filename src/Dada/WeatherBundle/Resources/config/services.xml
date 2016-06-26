@@ -9,7 +9,7 @@
             <argument>%openweather.api%</argument>
             <argument type="service" id="dada_cache" />
             <call method="setParams">
-                <argument>%openweather.api.keys%</argument>
+                <argument>%dada_weather.openweather_keys%</argument>
             </call>
         </service>
         <service id="dada_cache" class="Dada\WeatherBundle\Services\Cache\DadaCache">

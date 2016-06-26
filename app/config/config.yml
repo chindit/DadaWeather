@@ -38,6 +38,12 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
+# Config for OpenWeather
+dada_weather:
+    openweather_keys:
+        units: metric
+        lang: fr
+
 # Doctrine Configuration
 doctrine:
     dbal:
