@@ -79,7 +79,7 @@ class DadaOpenWeather{
     public function getWeatherFromName($name){
         if(strlen($name) <= 3)
             throw new \InvalidArgumentException('Expecting string longer than 3 char');
-        return $this->getAnswerFromApi(array('q' => $name)); //MUST be 'q' or search won't work
+        return $this->getAnswerFromApi(array('q' => urlencode($name))); //MUST be 'q' or search won't work
     }
 
 
