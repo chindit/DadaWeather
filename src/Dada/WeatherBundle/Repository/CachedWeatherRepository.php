@@ -46,12 +46,6 @@ class CachedWeatherRepository extends \Doctrine\ORM\EntityRepository
         $query->where('a.townId = :id')
             ->setParameter('id', $id);
         $query = $this->addExpiration($query);
-        if($single){
-            dump('a');$query->getQuery()->getSingleResult();
-        }
-        else{
-            dump('b');$query->getQuery()->getResult();
-        }
         return ($single) ? $query->getQuery()->getSingleResult() : $query->getQuery()->getResult();
     }
 
