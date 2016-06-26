@@ -5,12 +5,13 @@
 A simple weather app
 
 ## INSTAL
-1)Add these lines into your `config.yml`
-```# Config for OpenWeather
+1) Add these lines into your `config.yml`
+ ```# Config for OpenWeather
 dada_weather:
     openweather_keys:
         units: metric
         lang: fr```
-2)Add your OpenWeather API key into `parameters.yml`
-3)Load SQL schema `php bin/console doctrine:schema:update --force`
-4)That's it, you're good to go ;)
+
+2) Add your OpenWeather API key into `parameters.yml`
+3) Load SQL schema `php bin/console doctrine:schema:update --force`
+4) That's it, you're good to go ;)
